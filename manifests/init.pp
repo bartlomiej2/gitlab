@@ -99,7 +99,11 @@ class gitlab(
   $autoupgrade    = $gitlab::params::autoupgrade,
   $autoload_class = $gitlab::params::autoload_class,
   $package        = $gitlab::params::package,
-  $debug          = $gitlab::params::debug
+  $debug          = $gitlab::params::debug,
+  $gitlab_user	  = $gitlab::params::gitlab_user,
+  $gitlab_home	  = $gitlab::params::gitlab_home,
+  $redis_address  = $gitlab::params::redis_address,
+  $redis_port	  = $gitlab::params::redis_port
 ) inherits gitlab::params {
 
   #### Validate parameters
@@ -135,13 +139,17 @@ class gitlab(
   #### Manage actions
 
   # repository
-  class { 'gitlab::repo': }     # FIXME/TODO: Remove this declaration or this comment. See "repo.pp" for more information.
+  class { 'gitlab::repo': }
 
   # package(s)
   class { 'gitlab::package': }
 
   # configuration
-  class { 'gitlab::config': }   # FIXME/TODO: Remove this declaration or this comment. See "config.pp" for more information.
+  class { 'gitlab::config': }
+
+  class { 'gitlab::gitlab_user': }
+  class { 'gitlab::redis_wrapper': }
+  class { 'gitlab::rvm_wrapper': }
 
   # automatically load/include custom class if needed
   if $autoload_class != false {
@@ -150,14 +158,19 @@ class gitlab(
 
 
 
-  #### Manage relationships          # FIXME/TODO: Remove the whole relationships block if not needed
+  #### Manage relationships
 
   if $ensure == 'present' {
     # we need working repositories before installing packages
-    Class['gitlab::repo'] -> Class['gitlab::package']     # FIXME/TODO: Remove this relationship or this comment. See "repo.pp" for more information.
+    Class['gitlab::repo'] -> Class['gitlab::package']
 
     # we need the software before configuring it
-    Class['gitlab::package'] -> Class['gitlab::config']   # FIXME/TODO: Remove this relationship or this comment. See "config.pp" for more information.
+    Class['gitlab::package'] -> Class['gitlab::config']
+
+    #
+    Class['gitlab::package'] -> Class['gitlab::gitlab_user']
+    Class['gitlab::package'] -> Class['gitlab::redis_wrapper']
+    Class['gitlab::gitlab_user'] -> Class['gitlab::rvm_wrapper']
 
   } else {
     # there is currently no need for a specific removal order

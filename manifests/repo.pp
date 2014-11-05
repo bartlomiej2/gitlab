@@ -1,10 +1,5 @@
 # == Class: gitlab::repo
 #
-# FIXME/TODO Please check if you want to remove this class because it may be
-#            unnecessary for your module. Don't forget to update the class
-#            declarations and relationships at init.pp afterwards (the relevant
-#            parts are marked with "FIXME/TODO" comments).
-#
 # This class exists to coordinate all repository related actions, functionality
 # and logical units in a central place.
 #
@@ -31,25 +26,21 @@ class gitlab::repo {
 
   #### Repository management
 
-  # nothing right now
-
-  # Helpful snippets:
-  #
   # YUM repository. See 'yumrepo' doc at http://j.mp/gtCgFw for information.
-  # $repo_enabled = $gitlab::ensure ? {
-  #   # Removal of the repository file itself is currently not supported, (cf.
-  #   # http://j.mp/w7fA20). 'absent' just removes the 'enabled=0/1' line
-  #   # from the .repo file.
-  #   'present' => 1,
-  #   'absent'  => 0,
-  # }
-  # yumrepo { 'gitlab_yumrepo':
-  #   enabled  => $repo_enabled,
-  #   name     => 'gitlab', #corresponds to the yum.conf repositoryid
-  #   descr    => 'gitlab',
-  #   baseurl  => 'http://example.com/fedora/rpm/$releasever/stable/$basearch/',
-  #   gpgkey   => 'https://example.com/repo_signing_key.asc',
-  #   gpgcheck => 1,
-  # }
+  $repo_enabled = $gitlab::ensure ? {
+    # Removal of the repository file itself is currently not supported, (cf.
+    # http://j.mp/w7fA20). 'absent' just removes the 'enabled=0/1' line
+    # from the .repo file.
+    'present' => 1,
+    'absent'  => 0,
+  }
 
+  # Add RPMForge-extras repository for newest git package
+  yumrepo { 'rpmforge-extras':
+    enabled   => $repo_enabled,
+    baseurl   => "http://apt.sw.be/redhat/el6/en/${::architecture}/extras",
+    descr     => 'RHEL $releasever - RPMforge.net - extras',
+    gpgkey    => 'http://apt.sw.be/RPM-GPG-KEY.dag.txt',
+    gpgcheck  => 1,
+  }
 }

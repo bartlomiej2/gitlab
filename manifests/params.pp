@@ -40,10 +40,15 @@ class gitlab::params {
   # autoload_class
   $autoload_class = false
 
+  $gitlab_user    = 'git'
+  $gitlab_home    = "/home/${gitlab_user}"
+  $redis_address  = '127.0.0.1'
+  $redis_port     = '6379'
+
   # packages
   case $::operatingsystem { # see http://j.mp/x6Mtba for a list of known values
     'CentOS', 'Fedora', 'Scientific': {
-      $package = [ 'FIXME/TODO' ]
+      $package = [ 'git', 'libicu-devel', 'cmake', 'postgresql-devel' ]
     }
     'Debian', 'Ubuntu': {
       $package = [ 'FIXME/TODO' ]
@@ -60,6 +65,7 @@ class gitlab::params {
 
   #### Internal module values
 
-  # nothing right now
+  # Ruby version which will be installed for GitLab user by RVM
+  $ruby_version = '2.1.2'
 
 }

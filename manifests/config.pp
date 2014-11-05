@@ -1,10 +1,5 @@
 # == Class: gitlab::config
 #
-# FIXME/TODO Please check if you want to remove this class because it may be
-#            unnecessary for your module. Don't forget to update the class
-#            declarations and relationships at init.pp afterwards (the relevant
-#            parts are marked with "FIXME/TODO" comments).
-#
 # This class exists to coordinate all configuration related actions,
 # functionality and logical units in a central place.
 #

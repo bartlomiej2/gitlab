@@ -7,5 +7,7 @@ description 'Module for managing GitLab instance using puppet.'
 source 'UNKNOWN'
 project_page 'UNKNOWN'
 dependency 'puppetlabs-stdlib', '>= 2.3.1'
-
-
+dependency 'puppetlabs-vcsrepo', '>= 1.1.0'
+dependency 'puppetlabs-postgresql', '>= 4.0.0'
+dependency 'maestrodev-rvm', '>= 1.6.6'
+dependency 'fsalum-redis', '>= 1.0.2'
