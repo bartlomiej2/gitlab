@@ -2,7 +2,10 @@
 #
 # This module allows you to manage a GitLab intance with Puppet.
 #
-# [Add description - What does this module do on a node?] FIXME/TODO
+# GitLab offers git repository management, code reviews, issue tracking,
+# activity feeds, wikis. The puppet-gitlab module allows you to manage
+# GitLab installation with all required dependencies. The modulle provides
+# some options which allow you to customize installation.
 #
 #
 # === Parameters
@@ -37,6 +40,23 @@
 #   module will automatically execute <tt>class { $autoload_class: }</tt>.
 #   Excessive usage of this feature is not recommended in order to keep node
 #   definitions and class dependencies maintainable. Defaults to <tt>false</tt>.
+#
+# [*status*]
+#   String to define the status of the service. Possible values:
+#   * <tt>enabled</tt>: Service is running and will be started at boot time.
+#   * <tt>disabled</tt>: Service is stopped and will not be started at boot
+#     time.
+#   * <tt>running</tt>: Service is running but will not be started at boot time.
+#     You can use this to start a service on the first Puppet run instead of
+#     the system startup.
+#   * <tt>unmanaged</tt>: Service will not be started at boot time and Puppet
+#     does not care whether the service is running or not. For example, this may
+#     be useful if a cluster management software is used to decide when to start
+#     the service plus assuring it is running on the desired node.
+#   Defaults to <tt>enabled</tt>. The singular form ("service") is used for the
+#   sake of convenience. Of course, the defined status affects all services if
+#   more than one is managed (see <tt>service.pp</tt> to check if this is the
+#   case).
 #
 # [*package*]
 #   The default value to define which packages are managed by this module gets
@@ -112,6 +132,7 @@ class gitlab(
   $ensure	    = $gitlab::params::ensure,
   $autoupgrade      = $gitlab::params::autoupgrade,
   $autoload_class   = $gitlab::params::autoload_class,
+  $status	    = $gitlab::params::status,
   $package          = $gitlab::params::package,
   $debug            = $gitlab::params::debug,
   $user		    = $gitlab::params::user,
