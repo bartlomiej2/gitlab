@@ -23,7 +23,6 @@
 # * Evgeniy Evtushenko <mailto:evgeniye@crytek.com>
 #
 class gitlab::repo {
-
   #### Repository management
 
   # YUM repository. See 'yumrepo' doc at http://j.mp/gtCgFw for information.
@@ -43,4 +42,5 @@ class gitlab::repo {
     gpgkey    => 'http://apt.sw.be/RPM-GPG-KEY.dag.txt',
     gpgcheck  => 1,
   }
+
 }

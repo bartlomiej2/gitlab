@@ -16,7 +16,7 @@
 #
 # === Links
 #
-# * {Puppet Docs: Using Parameterized Classes}[http://j.mp/nVpyWY]
+# * {Puppet module for Redis Server}[https://forge.puppetlabs.com/fsalum/redis]
 #
 #
 # === Authors

@@ -32,18 +32,28 @@ class gitlab::params {
   #### Default values for the parameters of the main module class, init.pp
 
   # ensure
-  $ensure = 'present'
+  $ensure	    = 'present'
 
   # autoupgrade
-  $autoupgrade = false
+  $autoupgrade	    = false
 
   # autoload_class
-  $autoload_class = false
+  $autoload_class   = false
 
-  $gitlab_user    = 'git'
-  $gitlab_home    = "/home/${gitlab_user}"
-  $redis_address  = '127.0.0.1'
-  $redis_port     = '6379'
+  # service status
+  $status	    = 'enabled'
+
+  $gitlab_user	    = 'git'
+  $gitlab_group     = $gitlab_user
+  $gitlab_home      = "/home/${gitlab_user}"
+  $gitlab_version   = '7-4-stable'
+  $gitlab_subdomain = undef
+  $redis_address    = '127.0.0.1'
+  $redis_port       = '6379'
+  $unicorn_address  = '127.0.0.1'
+  $unicorn_port	    = '8880'
+  $ensure_https	    = true
+
 
   # packages
   case $::operatingsystem { # see http://j.mp/x6Mtba for a list of known values
@@ -58,6 +68,19 @@ class gitlab::params {
     }
   }
 
+  # service parameters
+  case $::operatingsystem {
+    'CentOS', 'Fedora', 'Scientific', 'Debian', 'Ubuntu': {
+      $service_name       = 'gitlab'
+      $service_hasrestart = true
+      $service_hasstatus  = true
+      $service_pattern    = $service_name
+    }
+    default: {
+      fail("\"${module_name}\" provides no service parameters for \"${::operatingsystem}\"")
+    }
+  }
+
   # debug
   $debug = false
 
@@ -67,5 +90,12 @@ class gitlab::params {
 
   # Ruby version which will be installed for GitLab user by RVM
   $ruby_version = '2.1.2'
+  # GitLab source repository
+  $gitlab_source_url = 'https://gitlab.com/gitlab-org/gitlab-ce.git'
+
+  # GitLab configuration files
+  $gitlab_config_files = [ 'gitlab.yml', 'unicorn.rb', 'resque.yml', 'database.yml' ]
+  $gitlab_shell_config_files = [ 'config.yml' ]
+  $gitlab_dirs = [ 'gitlab-sattelites', 'gitlab-shell', 'repositories' ]
 
 }

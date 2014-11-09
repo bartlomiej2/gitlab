@@ -95,15 +95,21 @@
 # * Evgeniy Evtushenko <mailto:evgeniye@crytek.com>
 #
 class gitlab(
-  $ensure         = $gitlab::params::ensure,
-  $autoupgrade    = $gitlab::params::autoupgrade,
-  $autoload_class = $gitlab::params::autoload_class,
-  $package        = $gitlab::params::package,
-  $debug          = $gitlab::params::debug,
-  $gitlab_user	  = $gitlab::params::gitlab_user,
-  $gitlab_home	  = $gitlab::params::gitlab_home,
-  $redis_address  = $gitlab::params::redis_address,
-  $redis_port	  = $gitlab::params::redis_port
+  $ensure	    = $gitlab::params::ensure,
+  $autoupgrade      = $gitlab::params::autoupgrade,
+  $autoload_class   = $gitlab::params::autoload_class,
+  $package          = $gitlab::params::package,
+  $debug            = $gitlab::params::debug,
+  $gitlab_user	    = $gitlab::params::gitlab_user,
+  $gitlab_group	    = $gitlab::params::gitlab_group,
+  $gitlab_home	    = $gitlab::params::gitlab_home,
+  $gitlab_version   = $gitlab::params::gitlab_version,
+  $gitlab_subdomain = $gitlab::params::gitlab_subdomain,
+  $redis_address    = $gitlab::params::redis_address,
+  $redis_port	    = $gitlab::params::redis_port,
+  $unicorn_address  = $gitlab::params::unicorn_address,
+  $unicorn_port     = $gitlab::params::unicorn_port
+
 ) inherits gitlab::params {
 
   #### Validate parameters
@@ -137,40 +143,36 @@ class gitlab(
 
 
   #### Manage actions
-
-  # repository
-  class { 'gitlab::repo': }
-
-  # package(s)
-  class { 'gitlab::package': }
-
-  # configuration
-  class { 'gitlab::config': }
-
+  class { 'gitlab::repo': }	      # repository
+  class { 'gitlab::package': }	      # package(s)
+  class { 'gitlab::config': }	      # configuration
+  class { 'gitlab::service': }	      # service
   class { 'gitlab::gitlab_user': }
+  class { 'gitlab::database': }
   class { 'gitlab::redis_wrapper': }
+  class { 'gitlab::gpg_key': }
   class { 'gitlab::rvm_wrapper': }
+  class { 'gitlab::gitlab_setup': }
 
   # automatically load/include custom class if needed
   if $autoload_class != false {
     class { $autoload_class: }
   }
 
-
-
   #### Manage relationships
 
   if $ensure == 'present' {
-    # we need working repositories before installing packages
-    Class['gitlab::repo'] -> Class['gitlab::package']
-
-    # we need the software before configuring it
-    Class['gitlab::package'] -> Class['gitlab::config']
-
-    #
-    Class['gitlab::package'] -> Class['gitlab::gitlab_user']
-    Class['gitlab::package'] -> Class['gitlab::redis_wrapper']
-    Class['gitlab::gitlab_user'] -> Class['gitlab::rvm_wrapper']
+    Class['gitlab::gpg_key'] -> Class['rvm']
+    Class['gitlab::gitlab_user'] ->	# Add system user for GitLab
+    Class['gitlab::repo'] ->		# Add repos
+    Class['gitlab::package'] ->		# Then install packages
+    Class['gitlab::gpg_key'] ->		# Add gpg key (fix for rvm)
+    Class['gitlab::rvm_wrapper'] ->	# Install rvm and ruby
+    Class['gitlab::redis_wrapper'] ->   # Install and setup ruby
+    Class['gitlab::database'] ->        # Create database
+    Class['gitlab::config'] ->	        # Generate configuration files
+    Class['gitlab::gitlab_setup'] ->    # Install GitLab (exec actions)
+    Class['gitlab::service']		# Enable service
 
   } else {
     # there is currently no need for a specific removal order

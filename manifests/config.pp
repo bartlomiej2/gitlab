@@ -23,28 +23,44 @@
 # * Evgeniy Evtushenko <mailto:evgeniye@crytek.com>
 #
 class gitlab::config {
-
   #### Configuration
 
-  # nothing right now
+  define generate_config ( $confdir = "${gitlab::gitlab_home}/gitlab/config" ) {
+    file { $title:
+      ensure  => $gitlab::ensure,
+      path    => "${confdir}/${title}",
+      content => template("${module_name}/${title}.erb"),
+      owner   => $gitlab::gitlab_user,
+      group   => $gitlab::gitlab_group,
+    }
+  }
 
-  # Helpful snippet(s):
-  #
-  # Config file. See 'file' doc at http://j.mp/wKju0C for information.
-  # file { 'gitlab_config':
-  #   ensure  => 'present',
-  #   path    => '/etc/gitlab/gitlab.conf',
-  #   mode    => '0644',
-  #   owner   => 'root',
-  #   group   => 'root',
-  #   # If you specify multiple file sources for a file, then the first source
-  #   # that exists will be used.
-  #   source  => [
-  #     "puppet:///modules/gitlab/config.cfg-$::fqdn",
-  #     "puppet:///modules/gitlab/config.cfg-$::hostname",
-  #     'puppet:///modules/gitlab/config.cfg'
-  #   ],
-  #   content => template('gitlab/config.erb'),
-  # }
+  generate_config { $gitlab::params::gitlab_config_files: }
 
+  # GitLab service config
+  file { '/etc/default/gitlab':
+    ensure  => $gitlab::ensure,
+    owner   => $gitlab::gitlab_user,
+    group   => $gitlab::gitlab_group,
+    source  => "${gitlab::gitlab_home}/gitlab/lib/support/init.d/gitlab.default.example",
+    #notify  => Service[$puppetmaster::params::service],
+  }
+
+  # GitLab service init-file
+  file { '/etc/init.d/gitlab':
+    ensure  => $gitlab::ensure,
+    mode    => '+x',
+    owner   => $gitlab::gitlab_user,
+    group   => $gitlab::gitlab_group,
+    source  => "${gitlab::gitlab_home}/gitlab/lib/support/init.d/gitlab",
+    #notify  => Service[$puppetmaster::params::service],
+  }
+
+  # logrotate config for GitLab
+  file { '/etc/logrotate.d/gitlab':
+    ensure  => $gitlab::ensure,
+    source  => "${gitlab::gitlab_home}/gitlab/lib/support/logrotate/gitlab",
+    owner   => $gitlab::gitlab_user,
+    group   => $gitlab::gitlab_group,
+  }
 }

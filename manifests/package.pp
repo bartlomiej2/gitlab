@@ -40,6 +40,9 @@ class gitlab::package {
       false => 'present',
     }
 
+    $vcs_ensure = 'present'
+    $directory_ensure = 'directory'
+
   # set params: removal
   } else {
 
@@ -48,7 +51,19 @@ class gitlab::package {
     # - Puppet type reference (package, "purgeable"): http://j.mp/xbxmNP
     # - Puppet's package provider source code: http://j.mp/wtVCaL
     $package_ensure = 'purged'
+    $vcs_ensure = 'absent'
+    $directory_ensure = 'absent'
 
+  }
+
+  define create_directory {
+    file { $title:
+      ensure  => $directory_ensure,
+      path    => "${gitlab::gitlab_home}/$title",
+      owner   => $gitlab::gitlab_user,
+      group   => $gitlab::gitlab_group,
+      mode    => 'g+rx',
+    }
   }
 
   # action
@@ -56,4 +71,15 @@ class gitlab::package {
     ensure => $package_ensure,
   }
 
+  # Clone GitLab code
+  vcsrepo { 'GitLab dir':
+    ensure    => $vcs_ensure,
+    path      => "${gitlab::gitlab_home}/gitlab",
+    provider  => 'git',
+    source    => $gitlab::params::gitlab_source_url,
+    revision  => $gitlab::gitlab_version,
+    user      => $gitlab::gitlab_user,
+  }
+  #Create all necessary directories
+  create_directory { $gitlab::params::gitlab_dirs: }
 }

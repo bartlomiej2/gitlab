@@ -28,7 +28,7 @@ class gitlab::gitlab_user {
   user { 'gitlab_user':
     ensure	=> $gitlab::ensure,
     name        => $gitlab::gitlab_user,
-    #shell       => '/bin/bash',
+    #shell       => '/sbin/nologin',
     home	=> $gitlab::gitlab_home,
     comment	=> 'GitLab',
     managehome	=> true,
@@ -38,7 +38,7 @@ class gitlab::gitlab_user {
   # get access to the git homefolder for nginx user.
   file { 'GitLab home directory':
     path    => $gitlab::gitlab_home,
-    mode    => '0750',
+    mode    => 'g+rX',
     require => User[ 'gitlab_user' ],
   }
 }
