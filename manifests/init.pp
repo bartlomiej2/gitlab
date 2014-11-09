@@ -64,9 +64,9 @@
 #     removed/cleaned up (e.g. <tt>debug_[module_name]_vardump</tt>).
 #   Defaults to <tt>false</tt>.
 #
-# [*gitlab_user*]
-#   The default value to define name of system user which will be used for GitLab
-#   gets set in gitlab::params. This parameter is able to overwrite the default.
+# [*user*]
+#   The default value to define name of system user used for GitLab. Defaults to
+#   <tt>git</tt>
 #
 # [*gitlab_group*]
 #
@@ -114,7 +114,7 @@ class gitlab(
   $autoload_class   = $gitlab::params::autoload_class,
   $package          = $gitlab::params::package,
   $debug            = $gitlab::params::debug,
-  $gitlab_user	    = $gitlab::params::gitlab_user,
+  $user		    = $gitlab::params::user,
   $gitlab_group	    = $gitlab::params::gitlab_group,
   $gitlab_home	    = $gitlab::params::gitlab_home,
   $gitlab_version   = $gitlab::params::gitlab_version,
@@ -161,11 +161,11 @@ class gitlab(
   class { 'gitlab::package': }	      # package(s)
   class { 'gitlab::config': }	      # configuration
   class { 'gitlab::service': }	      # service
-  class { 'gitlab::gitlab_user': }    # system user
+  class { 'gitlab::user': }    # system user
   class { 'gitlab::database': }	      # database
   class { 'gitlab::redis_wrapper': }  # redis
   class { 'gitlab::rvm_wrapper': }    # rvm and ruby
-  class { 'gitlab::gitlab_setup': }   # gitlab
+  class { 'gitlab::setup': }   # gitlab
 
   # automatically load/include custom class if needed
   if $autoload_class != false {
@@ -175,14 +175,14 @@ class gitlab(
   #### Manage relationships
 
   if $ensure == 'present' {
-    Class['gitlab::gitlab_user'] ->	# Add system user for GitLab
+    Class['gitlab::user'] ->	# Add system user for GitLab
     Class['gitlab::repo'] ->		# Add repositories
     Class['gitlab::package'] ->		# Then install packages
     Class['gitlab::rvm_wrapper'] ->	# Install rvm and ruby
     Class['gitlab::redis_wrapper'] ->   # Install and setup ruby
     Class['gitlab::database'] ->        # Create database
     Class['gitlab::config'] ->	        # Generate configuration files
-    Class['gitlab::gitlab_setup'] ->    # Install GitLab (exec actions)
+    Class['gitlab::setup'] ->    # Install GitLab (exec actions)
     Class['gitlab::service']		# Enable service
 
   } else {
