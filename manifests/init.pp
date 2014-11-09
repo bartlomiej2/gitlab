@@ -1,6 +1,6 @@
 # == Class: gitlab
 #
-# This class is able to install or remove gitlab on a node.
+# This module allows you to manage a GitLab intance with Puppet.
 #
 # [Add description - What does this module do on a node?] FIXME/TODO
 #
@@ -64,6 +64,25 @@
 #     removed/cleaned up (e.g. <tt>debug_[module_name]_vardump</tt>).
 #   Defaults to <tt>false</tt>.
 #
+# [*gitlab_user*]
+#   The default value to define name of system user which will be used for GitLab
+#   gets set in gitlab::params. This parameter is able to overwrite the default.
+#
+# [*gitlab_group*]
+#
+# [*gitlab_home*]
+#
+# [*gitlab_version*]
+#
+# [*redis_address*]
+#
+# [*redis_port*]
+#
+# [*unicorn_address*]
+#
+# [*unicorn_port*]
+#
+#
 # The default values for the parameters are set in gitlab::params. Have
 # a look at the corresponding <tt>params.pp</tt> manifest file if you need more
 # technical information about them.
@@ -77,11 +96,6 @@
 # * Removal/decommissioning:
 #     class { 'gitlab':
 #       ensure => 'absent',
-#     }
-#
-# * Installation with alternative package list:
-#     class { 'gitlab':
-#       package => [ "foo", "bar-1.2.3" ],
 #     }
 #
 # * Run installation with enabled debugging:
@@ -104,7 +118,6 @@ class gitlab(
   $gitlab_group	    = $gitlab::params::gitlab_group,
   $gitlab_home	    = $gitlab::params::gitlab_home,
   $gitlab_version   = $gitlab::params::gitlab_version,
-  $gitlab_subdomain = $gitlab::params::gitlab_subdomain,
   $redis_address    = $gitlab::params::redis_address,
   $redis_port	    = $gitlab::params::redis_port,
   $unicorn_address  = $gitlab::params::unicorn_address,
@@ -143,16 +156,16 @@ class gitlab(
 
 
   #### Manage actions
+
   class { 'gitlab::repo': }	      # repository
   class { 'gitlab::package': }	      # package(s)
   class { 'gitlab::config': }	      # configuration
   class { 'gitlab::service': }	      # service
-  class { 'gitlab::gitlab_user': }
-  class { 'gitlab::database': }
-  class { 'gitlab::redis_wrapper': }
-  class { 'gitlab::gpg_key': }
-  class { 'gitlab::rvm_wrapper': }
-  class { 'gitlab::gitlab_setup': }
+  class { 'gitlab::gitlab_user': }    # system user
+  class { 'gitlab::database': }	      # database
+  class { 'gitlab::redis_wrapper': }  # redis
+  class { 'gitlab::rvm_wrapper': }    # rvm and ruby
+  class { 'gitlab::gitlab_setup': }   # gitlab
 
   # automatically load/include custom class if needed
   if $autoload_class != false {
@@ -162,11 +175,9 @@ class gitlab(
   #### Manage relationships
 
   if $ensure == 'present' {
-    Class['gitlab::gpg_key'] -> Class['rvm']
     Class['gitlab::gitlab_user'] ->	# Add system user for GitLab
-    Class['gitlab::repo'] ->		# Add repos
+    Class['gitlab::repo'] ->		# Add repositories
     Class['gitlab::package'] ->		# Then install packages
-    Class['gitlab::gpg_key'] ->		# Add gpg key (fix for rvm)
     Class['gitlab::rvm_wrapper'] ->	# Install rvm and ruby
     Class['gitlab::redis_wrapper'] ->   # Install and setup ruby
     Class['gitlab::database'] ->        # Create database
@@ -177,7 +188,6 @@ class gitlab(
   } else {
     # there is currently no need for a specific removal order
   }
-
 
 
   #### Debugging

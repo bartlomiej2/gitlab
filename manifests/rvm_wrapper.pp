@@ -25,17 +25,13 @@
 # * Evgeniy Evtushenko <mailto:evgeniye@crytek.com>
 #
 class gitlab::rvm_wrapper {
-  ## Adding Michal Papis gpg key to prevent next error message:
-  ## "gpg: Can't check signature: No public key"
-  #exec { 'GPGkey':
-  #  command => 'gpg2 --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3',
-  #  path    => '/usr/bin',
-  #  creates => '/root/.gnupg/trustdb.gpg',
-  #}
-  # Code above moved to separate class: gitlab::gpg_key
-
+  # import class with FIX required to rvm installation
+  class { 'gitlab::gpg_key': }
   # Install Ruby Version Manager (RVM)
-  contain rvm
+  class { 'rvm': }
+
+  # FIX should be applied before rvm installation
+  Class['gitlab::gpg_key'] -> Class['rvm']
 
   # install newer ruby version (binary)
   rvm_system_ruby {
@@ -43,8 +39,20 @@ class gitlab::rvm_wrapper {
       ensure      => $gitlab::ensure,
       default_use => true,
       build_opts  => ['--binary'],
+      require	  => Class[ 'rvm' ],
   }
   # Set users which will be able to use newest version of ruby
   rvm::system_user { "${gitlab::gitlab_user}": ; }
 }
 
+class gitlab::gpg_key {
+  # FIX
+  # Adding Michal Papis gpg key to prevent error message
+  # during rvm installation:
+  # "gpg: Can't check signature: No public key"
+  exec { 'GPGkey':
+    command => 'gpg2 --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3',
+    path    => '/usr/bin',
+    creates => '/root/.gnupg/trustdb.gpg',
+  }
+}

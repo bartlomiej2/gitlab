@@ -47,7 +47,6 @@ class gitlab::params {
   $gitlab_group     = $gitlab_user
   $gitlab_home      = "/home/${gitlab_user}"
   $gitlab_version   = '7-4-stable'
-  $gitlab_subdomain = undef
   $redis_address    = '127.0.0.1'
   $redis_port       = '6379'
   $unicorn_address  = '127.0.0.1'
