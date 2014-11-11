@@ -24,23 +24,6 @@
 #   * This is thus destructive and should be used with care.
 #   Defaults to <tt>present</tt>.
 #
-# [*autoupgrade*]
-#   Boolean. If set to <tt>true</tt>, any managed package gets upgraded
-#   on each Puppet run when the package provider is able to find a newer
-#   version than the present one. The exact behavior is provider dependent.
-#   Q.v.:
-#   * Puppet type reference: {package, "upgradeable"}[http://j.mp/xbxmNP]
-#   * {Puppet's package provider source code}[http://j.mp/wtVCaL]
-#   Defaults to <tt>false</tt>.
-#
-# [*autoload_class*]
-#   String or <tt>false</tt>. Name of a custom class to manage module
-#   customization beyond the capabilities of the available module parameters
-#   (e.g. by using class inheritance to overwrite resources). If defined, this
-#   module will automatically execute <tt>class { $autoload_class: }</tt>.
-#   Excessive usage of this feature is not recommended in order to keep node
-#   definitions and class dependencies maintainable. Defaults to <tt>false</tt>.
-#
 # [*status*]
 #   String to define the status of the service. Possible values:
 #   * <tt>enabled</tt>: Service is running and will be started at boot time.
@@ -65,24 +48,6 @@
 #   However, usage of this feature is <b>not recommended</b> in order to keep
 #   the node definitions maintainable. It exists for <b>exceptional cases
 #   only</b>.
-#
-# [*debug*]
-#   Boolean switch to control the debugging functionality of this module. If set
-#   to <tt>true</tt>:
-#   * The main module class dumps all variables in its scope into the file
-#     <tt>$settings::vardir/debug_[module_name]_vardump</tt>. This will be done
-#     on every Puppet run. The file is located on the node
-#     (<tt>{$settings::vardir}[http://j.mp/w1g0Bl]</tt> is
-#     <tt>/var/lib/puppet</tt> by default).
-#   * The variable dump file gives you the chance to spot if some variable is
-#     not set as you want. Please note that variable names matching the pattern
-#     <tt>/(uptime.*|path|timestamp|free|.*password.*|.*psk.*|.*key)/</tt>
-#     are excluded for security reasons.
-#   If set to <tt>false</tt>:
-#   * All debugging features are disabled.
-#   * All possibly existing debug files this module created are being
-#     removed/cleaned up (e.g. <tt>debug_[module_name]_vardump</tt>).
-#   Defaults to <tt>false</tt>.
 #
 # [*user*]
 #   The default value to define name of system user used for GitLab. Defaults to
@@ -130,11 +95,8 @@
 #
 class gitlab(
   $ensure	    = $gitlab::params::ensure,
-  $autoupgrade      = $gitlab::params::autoupgrade,
-  $autoload_class   = $gitlab::params::autoload_class,
   $status	    = $gitlab::params::status,
   $package          = $gitlab::params::package,
-  $debug            = $gitlab::params::debug,
   $user		    = $gitlab::params::user,
   $gitlab_group	    = $gitlab::params::gitlab_group,
   $gitlab_home	    = $gitlab::params::gitlab_home,
@@ -154,9 +116,6 @@ class gitlab(
     fail("\"${ensure}\" is not a valid ensure parameter value")
   }
 
-  # autoupgrade
-  validate_bool($autoupgrade)
-
   # check ruby version
   if($ruby_version == undef) {
     fail('
@@ -166,24 +125,10 @@ class gitlab(
     )
   }
 
-  # autoload_class
-  if $autoload_class != false {
-    if !is_string($autoload_class) or empty($autoload_class) {
-      fail('"autoload_class" must be a valid class name or false')
-    }
-    if $autoload_class !~ /^[a-z](?:[a-z0-9_]*(?:\:\:)*[a-z0-9_]*){1,}[a-z0-9_]{1}$/ { # Cf. naming rules: http://j.mp/xuM3Rr and http://j.mp/wZ8quk
-      warning("\"${autoload_class}\" violates class naming restrictions")
-    }
-  }
-
   # package list
   if !is_array($package) or empty($package) {
     fail('"package" parameter must be an array of package names, containing at least one element')
   }
-
-  # debug
-  validate_bool($debug)
-
 
 
   #### Manage actions
@@ -214,25 +159,6 @@ class gitlab(
 
   } else {
     # there is currently no need for a specific removal order
-  }
-
-
-  #### Debugging
-
-  # dump variable names and values (idea from A. Franceschi, http://j.mp/wBJRjo)
-  $debug_vardump_ensure = $debug ? {
-    true  => 'present',
-    false => 'absent',
-  }
-  file { "debug_${module_name}_vardump":
-    ensure  => $debug_vardump_ensure,
-    path    => "${settings::vardir}/debug_${module_name}_vardump",
-    mode    => '0640',
-    owner   => 'root',
-    group   => 'root',
-    # do not forget to update the class documentation (-> 'debug' parameter) if
-    # you change the .reject regex pattern
-    content => inline_template('<%= scope.to_hash.reject { |k,v| k.to_s =~ /(uptime.*|path|timestamp|free|.*password.*|.*psk.*|.*key)/ }.sort.map { |k,v| "#{k}: #{v.inspect}"}.join("\n") + "\n" %>'),
   }
 
 }

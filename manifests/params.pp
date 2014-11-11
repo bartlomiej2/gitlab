@@ -30,19 +30,8 @@
 class gitlab::params {
 
   #### Default values for the parameters of the main module class, init.pp
-
-  # ensure
   $ensure	    = 'present'
-
-  # autoupgrade
-  $autoupgrade	    = false
-
-  # autoload_class
-  $autoload_class   = false
-
-  # service status
   $status	    = 'enabled'
-
   $gitlab_user	    = 'git'
   $gitlab_group     = $gitlab_user
   $gitlab_home      = "/home/${gitlab_user}"
@@ -79,10 +68,6 @@ class gitlab::params {
       fail("\"${module_name}\" provides no service parameters for \"${::operatingsystem}\"")
     }
   }
-
-  # debug
-  $debug = false
-
 
 
   #### Internal module values

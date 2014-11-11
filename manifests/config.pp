@@ -43,7 +43,6 @@ class gitlab::config {
     owner   => $gitlab::gitlab_user,
     group   => $gitlab::gitlab_group,
     source  => "${gitlab::gitlab_home}/gitlab/lib/support/init.d/gitlab.default.example",
-    #notify  => Service[$puppetmaster::params::service],
   }
 
   # GitLab service init-file
@@ -53,7 +52,6 @@ class gitlab::config {
     owner   => $gitlab::gitlab_user,
     group   => $gitlab::gitlab_group,
     source  => "${gitlab::gitlab_home}/gitlab/lib/support/init.d/gitlab",
-    #notify  => Service[$puppetmaster::params::service],
   }
 
   # logrotate config for GitLab

@@ -28,28 +28,12 @@ class gitlab::package {
 
   # set params: in operation
   if $gitlab::ensure == 'present' {
-
-    # Install managed packages if not present. Present packages are getting
-    # upgraded by using 'latest' if there is a newer version than the present
-    # one and the corresponding variable evaluates to true. The exact 'latest'
-    # behavior is provider dependent. Q.v.:
-    # - Puppet type reference (package, "upgradeable"): http://j.mp/xbxmNP
-    # - Puppet's package provider source code: http://j.mp/wtVCaL
-    $package_ensure = $gitlab::autoupgrade ? {
-      true  => 'latest',
-      false => 'present',
-    }
-
+    $package_ensure = $gitlab::ensure
     $vcs_ensure = 'present'
     $directory_ensure = 'directory'
 
-  # set params: removal
   } else {
 
-    # Remove/purge managed packages and their configuration files. The
-    # exact 'purged' behavior is provider dependent. Q.v.:
-    # - Puppet type reference (package, "purgeable"): http://j.mp/xbxmNP
-    # - Puppet's package provider source code: http://j.mp/wtVCaL
     $package_ensure = 'purged'
     $vcs_ensure = 'absent'
     $directory_ensure = 'absent'
