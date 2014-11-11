@@ -45,9 +45,9 @@ class gitlab::setup {
       creates => "${gitlab::gitlab_home}/gitlab/.puppet_bundle_exec.lock",
       cwd     => "${gitlab::gitlab_home}/gitlab",
       path    => [
-	"/usr/local/rvm/gems/ruby-${gitlab::params::ruby_version}/bin",
-        "/usr/local/rvm/gems/ruby-${gitlab::params::ruby_version}@global/bin",
-        "/usr/local/rvm/rubies/ruby-${gitlab::params::ruby_version}/bin",
+	"/usr/local/rvm/gems/ruby-${gitlab::ruby_version}/bin",
+        "/usr/local/rvm/gems/ruby-${gitlab::ruby_version}@global/bin",
+        "/usr/local/rvm/rubies/ruby-${gitlab::ruby_version}/bin",
         "/bin",
         "/usr/bin" ],
       timeout => 0,

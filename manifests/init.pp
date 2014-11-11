@@ -142,7 +142,8 @@ class gitlab(
   $redis_address    = $gitlab::params::redis_address,
   $redis_port	    = $gitlab::params::redis_port,
   $unicorn_address  = $gitlab::params::unicorn_address,
-  $unicorn_port     = $gitlab::params::unicorn_port
+  $unicorn_port     = $gitlab::params::unicorn_port,
+  $ruby_version	    = undef
 
 ) inherits gitlab::params {
 
@@ -155,6 +156,15 @@ class gitlab(
 
   # autoupgrade
   validate_bool($autoupgrade)
+
+  # check ruby version
+  if($ruby_version == undef) {
+    fail('
+      Parametr ruby_version is not set.
+      Please set correct version of ruby that you installed with RVM. For example:
+      class { "gitlab": ruby_version => "2.1.2", }'
+    )
+  }
 
   # autoload_class
   if $autoload_class != false {
