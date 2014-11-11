@@ -28,17 +28,18 @@ class gitlab::user {
   user { 'gitlab_user':
     ensure	=> $gitlab::ensure,
     name        => $gitlab::gitlab_user,
-    #shell       => '/sbin/nologin',
     home	=> $gitlab::gitlab_home,
     comment	=> 'GitLab',
     managehome	=> true,
-  }
+  } ->
 
   # Make /home/git readable for group 'git'. This allows
   # get access to the git homefolder for nginx user.
   file { 'GitLab home directory':
     path    => $gitlab::gitlab_home,
     mode    => 'g+rX',
-    require => User[ 'gitlab_user' ],
-  }
+  } ->
+
+  # To use RVM without sudo, users need to be added to the rvm group:
+  rvm::system_user { "${gitlab::gitlab_user}": ; }
 }
