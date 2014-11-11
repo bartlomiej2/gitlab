@@ -139,12 +139,8 @@ class gitlab(
   class { 'gitlab::service': }	  # service
   class { 'gitlab::user': }	  # system user
   class { 'gitlab::database': }	  # database
+  class { 'gitlab::cvs_repo': }	  # GitLab repository
   class { 'gitlab::setup': }	  # gitlab
-
-  # automatically load/include custom class if needed
-  if $autoload_class != false {
-    class { $autoload_class: }
-  }
 
   #### Manage relationships
 
@@ -152,6 +148,7 @@ class gitlab(
     Class['gitlab::user'] ->	  # Add system user for GitLab
     Class['gitlab::repo'] ->	  # Add repositories
     Class['gitlab::package'] ->	  # Then install packages
+    Class['gitlab::cvs_repo'] ->  # Add repositories
     Class['gitlab::database'] ->  # Create database
     Class['gitlab::config'] ->	  # Generate configuration files
     Class['gitlab::setup'] ->	  # Install GitLab (exec actions)
