@@ -188,14 +188,13 @@ class gitlab(
 
   #### Manage actions
 
-  class { 'gitlab::repo': }	      # repository
-  class { 'gitlab::package': }	      # package(s)
-  class { 'gitlab::config': }	      # configuration
-  class { 'gitlab::service': }	      # service
-  class { 'gitlab::user': }    # system user
-  class { 'gitlab::database': }	      # database
-  class { 'gitlab::redis_wrapper': }  # redis
-  class { 'gitlab::setup': }   # gitlab
+  class { 'gitlab::repo': }	  # repository
+  class { 'gitlab::package': }	  # package(s)
+  class { 'gitlab::config': }	  # configuration
+  class { 'gitlab::service': }	  # service
+  class { 'gitlab::user': }	  # system user
+  class { 'gitlab::database': }	  # database
+  class { 'gitlab::setup': }	  # gitlab
 
   # automatically load/include custom class if needed
   if $autoload_class != false {
@@ -205,14 +204,13 @@ class gitlab(
   #### Manage relationships
 
   if $ensure == 'present' {
-    Class['gitlab::user'] ->	# Add system user for GitLab
-    Class['gitlab::repo'] ->		# Add repositories
-    Class['gitlab::package'] ->		# Then install packages
-    Class['gitlab::redis_wrapper'] ->   # Install and setup ruby
-    Class['gitlab::database'] ->        # Create database
-    Class['gitlab::config'] ->	        # Generate configuration files
-    Class['gitlab::setup'] ->    # Install GitLab (exec actions)
-    Class['gitlab::service']		# Enable service
+    Class['gitlab::user'] ->	  # Add system user for GitLab
+    Class['gitlab::repo'] ->	  # Add repositories
+    Class['gitlab::package'] ->	  # Then install packages
+    Class['gitlab::database'] ->  # Create database
+    Class['gitlab::config'] ->	  # Generate configuration files
+    Class['gitlab::setup'] ->	  # Install GitLab (exec actions)
+    Class['gitlab::service']	  # Enable service
 
   } else {
     # there is currently no need for a specific removal order
