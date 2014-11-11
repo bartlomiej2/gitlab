@@ -87,8 +87,6 @@ class gitlab::params {
 
   #### Internal module values
 
-  # Ruby version which will be installed for GitLab user by RVM
-  $ruby_version = '2.1.2'
   # GitLab source repository
   $gitlab_source_url = 'https://gitlab.com/gitlab-org/gitlab-ce.git'
 

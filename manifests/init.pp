@@ -185,7 +185,6 @@ class gitlab(
   class { 'gitlab::user': }    # system user
   class { 'gitlab::database': }	      # database
   class { 'gitlab::redis_wrapper': }  # redis
-  class { 'gitlab::rvm_wrapper': }    # rvm and ruby
   class { 'gitlab::setup': }   # gitlab
 
   # automatically load/include custom class if needed
@@ -199,7 +198,6 @@ class gitlab(
     Class['gitlab::user'] ->	# Add system user for GitLab
     Class['gitlab::repo'] ->		# Add repositories
     Class['gitlab::package'] ->		# Then install packages
-    Class['gitlab::rvm_wrapper'] ->	# Install rvm and ruby
     Class['gitlab::redis_wrapper'] ->   # Install and setup ruby
     Class['gitlab::database'] ->        # Create database
     Class['gitlab::config'] ->	        # Generate configuration files
