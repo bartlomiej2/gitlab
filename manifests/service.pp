@@ -79,7 +79,6 @@ class gitlab::service {
     name       => $gitlab::params::service_name,
     hasstatus  => $gitlab::params::service_hasstatus,
     hasrestart => $gitlab::params::service_hasrestart,
-    pattern    => $gitlab::params::service_pattern,
   }
 
 }

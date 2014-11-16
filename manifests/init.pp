@@ -101,6 +101,7 @@ class gitlab(
   $gitlab_group	    = $gitlab::params::gitlab_group,
   $gitlab_home	    = $gitlab::params::gitlab_home,
   $gitlab_version   = $gitlab::params::gitlab_version,
+  $gitlab_address   = $gitlab::params::gitlab_address,
   $redis_address    = $gitlab::params::redis_address,
   $redis_port	    = $gitlab::params::redis_port,
   $unicorn_address  = $gitlab::params::unicorn_address,
@@ -133,26 +134,30 @@ class gitlab(
 
   #### Manage actions
 
-  class { 'gitlab::repo': }	  # repository
-  class { 'gitlab::package': }	  # package(s)
-  class { 'gitlab::config': }	  # configuration
-  class { 'gitlab::service': }	  # service
-  class { 'gitlab::user': }	  # system user
-  class { 'gitlab::database': }	  # database
-  class { 'gitlab::cvs_repo': }	  # GitLab repository
-  class { 'gitlab::setup': }	  # gitlab
+  class { 'gitlab::repo': }	    # repository
+  class { 'gitlab::package': }	    # package(s)
+  class { 'gitlab::config': }	    # configuration
+  class { 'gitlab::service': }	    # service
+  class { 'gitlab::user': }	    # system user
+  class { 'gitlab::database': }	    # database
+  class { 'gitlab::cvs_repo': }	    # GitLab repository
+  class { 'gitlab::directories': }  # GitLab repository
+  class { 'gitlab::setup': }	    # gitlab
+  class { 'gitlab::proxy': }	    # apache reverse-proxy for gitlab
 
   #### Manage relationships
 
   if $ensure == 'present' {
-    Class['gitlab::user'] ->	  # Add system user for GitLab
-    Class['gitlab::repo'] ->	  # Add repositories
-    Class['gitlab::package'] ->	  # Then install packages
-    Class['gitlab::cvs_repo'] ->  # Add repositories
-    Class['gitlab::database'] ->  # Create database
-    Class['gitlab::config'] ->	  # Generate configuration files
-    Class['gitlab::setup'] ->	  # Install GitLab (exec actions)
-    Class['gitlab::service']	  # Enable service
+    Class['gitlab::user'] ->	    # Add system user for GitLab
+    Class['gitlab::repo'] ->	    # Add repositories
+    Class['gitlab::package'] ->	    # Then install packages
+    Class['gitlab::cvs_repo'] ->    # Add repositories
+    Class['gitlab::directories'] -> # Create directories and set owner/mode
+    Class['gitlab::database'] ->    # Create database
+    Class['gitlab::config'] ->	    # Generate configuration files
+    Class['gitlab::setup'] ->	    # Install GitLab (exec actions)
+    Class['gitlab::service'] ->	    # Enable service
+    Class['gitlab::proxy']	    # Configure apache as reverse-proxy for GitLab
 
   } else {
     # there is currently no need for a specific removal order

@@ -15,14 +15,9 @@ production: &base
   ## GitLab settings
   gitlab:
     ## Web server settings (note: host is the FQDN, do not include http://)
-    host: <% if !defined? gitlab_subdomain %><%= @gitlab_subdomain %>.<% end %><%= @fqdn %>
-    <% if @ensure_https = true %>
+    host: <%= @gitlab_address %>
     port: 443
     https: true
-    <% else %>
-    port: 80
-    https: false
-    <% end %>
 
     # Uncommment this line below if your ssh host is different from HTTP/HTTPS one
     # (you'd obviously need to replace ssh.host_example.com with your own host).

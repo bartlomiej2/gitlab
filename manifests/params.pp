@@ -36,11 +36,14 @@ class gitlab::params {
   $gitlab_group     = $gitlab_user
   $gitlab_home      = "/home/${gitlab_user}"
   $gitlab_version   = '7-4-stable'
+  $gitlab_address   = "gitlab.${::fqdn}"
   $redis_address    = '127.0.0.1'
   $redis_port       = '6379'
   $unicorn_address  = '127.0.0.1'
   $unicorn_port	    = '8880'
   $ensure_https	    = true
+  $http_user	    = 'apache'
+  $http_group	    = 'apache'
 
 
   # packages
@@ -62,7 +65,6 @@ class gitlab::params {
       $service_name       = 'gitlab'
       $service_hasrestart = true
       $service_hasstatus  = true
-      $service_pattern    = $service_name
     }
     default: {
       fail("\"${module_name}\" provides no service parameters for \"${::operatingsystem}\"")

@@ -52,6 +52,7 @@ class gitlab::setup {
         "/usr/bin" ],
       timeout => 0,
       user    => $gitlab::gitlab_user,
+      require => Class['puppet_stack::rvm_wrapper'],
     }
   }
 
