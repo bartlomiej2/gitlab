@@ -73,7 +73,8 @@ class gitlab::proxy {
     port	      	=> '443',
 
     proxy_preserve_host	=> true,
-    proxy_pass		=> [ { 'path' => '/', 'url' => "http://${gitlab::unicorn_address}:${gitlab::unicorn_port}/" }, ],
+    proxy_dest		=> "http://${gitlab::unicorn_address}:${gitlab::unicorn_port}",
+    no_proxy_uris	=> [ "/uploads", "/assets" ],
 
     # apache equivalent of nginx try files
     # http://serverfault.com/questions/290784/what-is-apaches-equivalent-of-nginxs-try-files

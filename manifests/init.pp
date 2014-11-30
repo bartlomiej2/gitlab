@@ -97,7 +97,7 @@ class gitlab(
   $ensure	    = $gitlab::params::ensure,
   $status	    = $gitlab::params::status,
   $package          = $gitlab::params::package,
-  $user		    = $gitlab::params::user,
+  $gitlab_user	    = $gitlab::params::gitlab_user,
   $gitlab_group	    = $gitlab::params::gitlab_group,
   $gitlab_home	    = $gitlab::params::gitlab_home,
   $gitlab_version   = $gitlab::params::gitlab_version,
