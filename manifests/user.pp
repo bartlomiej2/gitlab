@@ -37,6 +37,7 @@ class gitlab::user {
   # get access to the git homefolder for nginx user.
   file { 'GitLab home directory':
     path    => $gitlab::gitlab_home,
+    group   => $gitlab::gitlab_group,
     mode    => 'g+rX',
   } ->
 
