@@ -49,7 +49,7 @@ class gitlab::params {
   # packages
   case $::operatingsystem { # see http://j.mp/x6Mtba for a list of known values
     'CentOS', 'Fedora', 'Scientific': {
-      $package = [ 'git', 'libicu-devel', 'cmake', 'postgresql-devel' ]
+      $package = [ 'libicu-devel', 'cmake', 'postgresql-devel' ]
     }
     'Debian', 'Ubuntu': {
       $package = [ 'FIXME/TODO' ]
@@ -58,6 +58,7 @@ class gitlab::params {
       fail("\"${module_name}\" provides no package default value for \"${::operatingsystem}\"")
     }
   }
+  $git_package = 'git'
 
   # service parameters
   case $::operatingsystem {

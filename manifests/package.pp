@@ -28,14 +28,19 @@ class gitlab::package {
 
   # set params: in operation
   if $gitlab::ensure == 'present' {
-    $package_ensure = $gitlab::ensure
+    $package_ensure	= $gitlab::ensure
+    $git_package_ensure = latest
   } else {
     $package_ensure = 'purged'
+    $git_package_ensure = 'purged'
   }
 
   # action
   package { $gitlab::package:
     ensure => $package_ensure,
+  }
+  package { $gitlab::git_package:
+    ensure => $git_package_ensure,
   }
 
 }
